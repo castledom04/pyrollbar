@@ -1065,15 +1065,22 @@ def _extract_wsgi_headers(items):
 
 
 def _build_django_request_data(request):
+
+
+    try:
+        wsgi_request = request._request
+    except AttributeError:
+        wsgi_request = request
+
     request_data = {
         'url': request.build_absolute_uri(),
         'method': request.method,
         'GET': dict(request.GET),
         'POST': dict(request.POST),
-        'user_ip': _wsgi_extract_user_ip(request.environ),
+        'user_ip': _wsgi_extract_user_ip(wsgi_request.environ),
     }
 
-    request_data['headers'] = _extract_wsgi_headers(request.environ.items())
+    request_data['headers'] = _extract_wsgi_headers(wsgi_request.environ.items())
 
     return request_data
 
